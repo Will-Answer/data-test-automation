@@ -1,22 +1,27 @@
 import psycopg2 as psql
 
-#gets database info (defaults in brackets)
-db_name = input('DB Name (postgres): ')
-if db_name == '': db_name = 'postgres'
-db_user = input('User (postgres): ')
-if db_user == '': db_user = 'postgres'
-db_password = input('Password (1): ')
-if db_password == '': db_password = '1'
+def query(db_name='postgres',db_user='postgres',db_password='1',queries=['SELECT * FROM raw.game;']):
+    try:
+        #connects to and adds controller to database
+        db = psql.connect(dbname=db_name, user=db_user, password=db_password)
+        ctrl = db.cursor()
 
+        #print all from game
+        for query in queries:
+            ctrl.execute(query)
+            print(ctrl.fetchall())
 
-#connects to and adds controller to database
-db = psql.connect(dbname=db_name, user=db_user, password=db_password)
-ctrl = db.cursor()
+        #close comms
+        ctrl.close()
+        db.close()
+        return 0
+    except:
+        return 1
 
-#print all from game
-ctrl.execute('SELECT * FROM raw.game;')
-print(ctrl.fetchall())
+if __name__ == '__main__':
+    #gets database info (defaults in brackets)
+    db_name = input('DB Name (postgres): ')
+    db_user = input('User (postgres): ')
+    db_password = input('Password (1): ')
+    print(query())
 
-#close comms
-ctrl.close()
-db.close()
