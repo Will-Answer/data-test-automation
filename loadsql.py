@@ -45,13 +45,27 @@ def extract(dir):
             contents[filename] = queries
     return contents #returns dictionary with its value as a list containing a list of comment lines and list of queries
 
-if __name__ == '__main__':
-    #Gets template answers
-    template = extract(os.getenv('template'))
+def get_template():
+    """Gets the template solutions as a dictionary
 
-    #Gets response answers
+    ### Returns:  
+    Dict {'question number' : [queries]}
+    """
+    return extract(os.getenv('template'))
+
+def get_responses():
+    """Gets all candidate responses as a dictionary containing dictionaries
+
+    ### Returns:  
+    Dict {'candidate name': {  
+        'question number' : [queries]}  
+    }
+    """
     rsp_dirs = os.listdir(os.getenv('responses'))
     responses = {}
     for dir in rsp_dirs:
         responses[dir] = extract(f'{os.getenv('responses')}\\{dir}')
-    print(responses['will_pinder']['1'])
+    return responses
+
+if __name__ == '__main__':
+    print(get_responses()['will_pinder']['1'])
