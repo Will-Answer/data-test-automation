@@ -1,27 +1,56 @@
 import psycopg2 as psql
 
-def query(db_name='postgres',db_user='postgres',db_password='1',queries=['SELECT * FROM raw.game;']):
-    try:
-        #connects to and adds controller to database
-        db = psql.connect(dbname=db_name, user=db_user, password=db_password)
-        ctrl = db.cursor()
+class Database():
+    """A class used to connect to and execute queries on psql databases"""
+    def __init__(self) -> None:
+        #gets database info (defaults in brackets)
+        self.name = input('DB Name (postgres): ')
+        self.user = input('User (postgres): ')
+        self.pwd = input('Password (1): ')
+        if self.name == '':
+            self.name = 'postgres'
+        if self.user == '':
+            self.user = 'postgres'
+        if self.pwd == '':
+            self.pwd = '1'
+        self.connect()
+        
+    def connect(self):
+        """Connects to database using arguments passed on instantiation"""
+        try:
+            #connects to and adds controller to database
+            self.db = psql.connect(dbname=self.name, user=self.user, password=self.pwd)
+            self.ctrl = self.db.cursor()
+        except:
+            #Error code on connection
+            return 1
+        
+    def query(self,queries=['SELECT * FROM raw.game;']):
+        """Queries the database
 
-        #print all from game
-        for query in queries:
-            ctrl.execute(query)
-            print(ctrl.fetchall())
+        Parameters:
+            queries - SQL queries passed as a list of strings
+        Returns:
+            The output of the queries as a list of lists of tuples
+            1 - if there is any error
+        """
+        self.output = []
+        try:
+            for query in queries:
+                self.ctrl.execute(query)
+                self.output.append(self.ctrl.fetchall())
+            return self.output
+        except:
+            return 2
 
-        #close comms
-        ctrl.close()
-        db.close()
+    def close(self):
+        """Close comms"""
+        self.ctrl.close()
+        self.db.close()
         return 0
-    except:
-        return 1
+
 
 if __name__ == '__main__':
-    #gets database info (defaults in brackets)
-    db_name = input('DB Name (postgres): ')
-    db_user = input('User (postgres): ')
-    db_password = input('Password (1): ')
-    print(query())
+    db = Database()
+    print(db.query())
 
