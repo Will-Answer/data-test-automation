@@ -16,7 +16,7 @@ class Database():
         self.connect()
         
     def connect(self):
-        """Connects to database using arguments passed on instantiation"""
+        """Connects to database using instance variables created in __init__"""
         try:
             #connects to and adds controller to database
             self.db = psql.connect(dbname=self.name, user=self.user, password=self.pwd)
