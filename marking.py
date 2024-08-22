@@ -2,10 +2,10 @@ import dbconnect as dbc
 import loadsql as load
 import pandas as pd
 
-log = open('log.txt','w')
+log = open('log.txt','w') #opens crashlog and database
 db = dbc.Database()
 
-template = load.get_template()
+template = load.get_template() #loads template responses into a dictionary of pandas dataframes (keys are question numbers)
 template_proc = {}
 for question in template:
     try:
@@ -14,7 +14,7 @@ for question in template:
     except BaseException as err:
         print(f'Error loading templates\nError: {err}\n---------------',file=log)
 
-responses = load.get_responses()
+responses = load.get_responses() #loads responses into a dictionary of dictionaries of pandas dataframes (keys are candidates then quesiton numbers)
 response_proc = {}
 for candidate in responses:
     response_proc[candidate] = {}
@@ -25,7 +25,7 @@ for candidate in responses:
         except BaseException as err:
             print(f'Candidate: {candidate}\nQuestion: {question}\nError: {err}\n---------------',file=log)
 
-for i in template_proc:
+for i in template_proc: #prints the processed templates and responses
     print(f'{template_proc[i]}\n\n')
 
 print('\n--------------------\n\n')
