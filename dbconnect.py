@@ -1,18 +1,16 @@
 import psycopg2 as psql
+from os import getenv as env
+from dotenv import load_dotenv
+
+load_dotenv()
 
 class Database():
     """A class used to connect to and execute queries on psql databases"""
     def __init__(self) -> None:
         #gets database info (defaults in brackets)
-        self.name = input('DB Name (postgres): ')
-        self.user = input('User (postgres): ')
-        self.pwd = input('Password (1): ')
-        if self.name == '':
-            self.name = 'postgres'
-        if self.user == '':
-            self.user = 'postgres'
-        if self.pwd == '':
-            self.pwd = '1'
+        self.name = env('db_name')
+        self.user = env('db_user')
+        self.pwd = env('db_password')
         self.connect()
         
     def connect(self):
