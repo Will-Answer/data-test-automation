@@ -5,4 +5,5 @@ Open "init.cmd" and change the placeholder to the file location of psql_setup.sq
 Run init.cmd 
 
 ## --Troubleshooting--
+
 If init.cmd does not work, check the installation directory of Postgres. You might have to change the path commands.
