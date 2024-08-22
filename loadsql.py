@@ -42,7 +42,7 @@ def extract(dir):
                     queries[iter] = queries[iter].strip() + ';'
                 else:
                     queries.remove('')
-            contents[filename] = [commlines,queries]
+            contents[filename] = queries
     return contents #returns dictionary with its value as a list containing a list of comment lines and list of queries
 
 if __name__ == '__main__':
