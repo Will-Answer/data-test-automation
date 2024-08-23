@@ -5,7 +5,7 @@
 import os
 from dotenv import load_dotenv
 
-log=open('loadlog.txt','w')
+log=open('log.txt','a')
 
 load_dotenv()
 def extract(dir):

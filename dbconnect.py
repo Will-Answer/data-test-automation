@@ -4,7 +4,7 @@ from os import getenv as env
 from dotenv import load_dotenv
 
 load_dotenv()
-log = open('db_log.txt','w')
+log = open('log.txt','a')
 
 class Database():
     """A class used to connect to and execute queries on psql databases"""
