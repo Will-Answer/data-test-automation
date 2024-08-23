@@ -2,9 +2,12 @@ import dbconnect as dbc
 import loadsql as load
 import pandas as pd
 import sys
+import json
 
 log = open('log.txt','a') #opens crashlog and database
 db = dbc.Database()
+with open('settings.json') as settingsjson:
+    settings = json.load(settingsjson)
 
 def queryall(queries,type='t',candidate='tester'):
     """Processes a dictionary of queries with keys as quesion numbers into a dictionary of dataframes
@@ -34,6 +37,33 @@ def queryall(queries,type='t',candidate='tester'):
                 processed[query] = 'Err'
     return processed
 
+def mark(template,responses,ordered=[]):
+    """Compares template answers to responses, using a list to determine questions that require order.
+    Incorrect responses fetch the SQL query from its file and errors in execution are reported in log.txt.
+
+    ### Parameters:
+    - template (dict) - the template responses as a dictionary of pandas dataframes
+    - responses (dict) - the response dictionary of all of the canditates
+    - ordered (list) - a list of the questions that should be ordered
+    """
+    scores = {'name':['Total'],'score':[len(template)]}
+    candnum = 0
+    for candidate in responses:
+        candnum += 1
+        scores['name'].append(candidate)
+        scores['score'].append(0)
+        for qnum in responses[candidate]:
+            restable = responses[candidate][qnum]
+            temptable = template[qnum]
+            if restable == 'Err':
+                pass
+            elif restable.size == 1:
+                if restable.values == temptable.values:
+                    scores['score'][candnum] += 1
+                else:
+                    pass
+    return pd.DataFrame(scores)
+                    
 
 template = load.get_template() #loads template responses into a dictionary of pandas dataframes (keys are question numbers)
 responses = load.get_responses() #loads responses into a dictionary of dictionaries of pandas dataframes (keys are candidates then quesiton numbers)
@@ -43,7 +73,8 @@ response_proc = {}
 for candidate in responses: #processes responses
     response_proc[candidate] = queryall(responses[candidate],'r',candidate)
 
-for i in template_proc: #prints the processed templates and responses
+print(mark(template_proc,response_proc,settings['requires_order']))
+'''for i in template_proc: #prints the processed templates and responses
     print(f'{i})\n{template_proc[i]}\n\n')
 
 print('\n--------------------\n\n')
@@ -53,4 +84,4 @@ for i in response_proc:
     for table in response_proc[i]:
         print(f'{table})\n{response_proc[i][table]}\n\n')
 
-db.close()
+db.close() #commented out, remove quotes for testing'''
