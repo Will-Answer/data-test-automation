@@ -1,13 +1,20 @@
 import dbconnect as dbc
 import loadsql as load
 import pandas as pd
+from dotenv import load_dotenv
 import sys
 import json
+import os
 
 log = open('log.txt','a') #opens crashlog and database
 db = dbc.Database()
 with open('settings.json') as settingsjson:
     settings = json.load(settingsjson)
+load_dotenv()
+if 'results' not in os.listdir():
+    os.mkdir('results')
+scorecard = open('results/scorecard.txt','w')
+mistakes = open('results/mistakes.txt','w')
 
 def queryall(queries,type='t',candidate='tester'):
     """Processes a dictionary of queries with keys as quesion numbers into a dictionary of dataframes
@@ -55,17 +62,26 @@ def mark(template,responses,ordered=[]):
         scores['name'].append(candidate)
         scores['score'].append(0)
         for qnum in responses[candidate]:
-            restable = responses[candidate][qnum]
-            temptable = template[qnum]
-            if type(restable) == str:
-                if restable == 'Err':
+            res_table = responses[candidate][qnum]
+            temp_table = template[qnum]
+            if type(res_table) == str:
+                if res_table == 'Err':
                     pass
-            elif restable.size == 1:
-                if restable.values == temptable.values:
+            elif res_table.size == 1:
+                if res_table.values == temp_table.values:
                     scores['score'][candnum] += 1
                 else:
-                    pass
+                    incorrect(candidate,qnum)
+
     return pd.DataFrame(scores)
+
+def incorrect(candidate,qnum):
+    queryfile = open(f'{os.getenv('responses')}\\{candidate}\\{qnum}.sql')
+    querylines = ''
+    for line in queryfile:
+        querylines += line
+    print(f'Candidate: {candidate}\nQuestion: {qnum}\n Query:\n{querylines}\n--------------\n',file=mistakes)
+    queryfile.close()
                     
 
 template = load.get_template() #loads template responses into a dictionary of pandas dataframes (keys are question numbers)
@@ -76,7 +92,7 @@ response_proc = {}
 for candidate in responses: #processes responses
     response_proc[candidate] = queryall(responses[candidate],'r',candidate)
 
-print(mark(template_proc,response_proc,settings['requires_order']))
+print(mark(template_proc,response_proc,settings['requires_order']),file=scorecard)
 '''for i in template_proc: #prints the processed templates and responses
     print(f'{i})\n{template_proc[i]}\n\n')
 
