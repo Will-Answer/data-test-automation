@@ -32,7 +32,6 @@ class Database():
             queries - SQL queries passed as a list of strings
         Returns:
             The output of the queries as a list of lists of tuples
-            1 - if there is any error
         """
         self.output = []
         for query in queries:

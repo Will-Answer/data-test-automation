@@ -35,6 +35,12 @@ CREATE TABLE raw.member_game_instance (
     points INT NOT NULL
 );
 
+--reset sequences
+ALTER SEQUENCE raw.game_id_seq RESTART WITH 11;
+ALTER SEQUENCE raw.game_instance_id_seq RESTART WITH 3000;
+ALTER SEQUENCE raw.member_id_seq RESTART WITH 1001;
+ALTER SEQUENCE raw.member_game_instance_id_seq RESTART WITH 5000;
+
 /** populate tables **/
 
 --game_instance
