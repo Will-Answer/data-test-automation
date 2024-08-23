@@ -35,6 +35,8 @@ def queryall(queries,type='t',candidate='tester'):
             elif type == "r":
                 print(f'Candidate: {candidate}\nQuestion: {query}\nError: {err}\n---------------',file=log)
                 processed[query] = 'Err'
+                db.close() #reloads connection so subsequent blocks can execute
+                db.connect()
     return processed
 
 def mark(template,responses,ordered=[]):
@@ -55,8 +57,9 @@ def mark(template,responses,ordered=[]):
         for qnum in responses[candidate]:
             restable = responses[candidate][qnum]
             temptable = template[qnum]
-            if restable == 'Err':
-                pass
+            if type(restable) == str:
+                if restable == 'Err':
+                    pass
             elif restable.size == 1:
                 if restable.values == temptable.values:
                     scores['score'][candnum] += 1
