@@ -15,8 +15,9 @@ if 'results' not in os.listdir():
     os.mkdir('results')
 scorecard = open('results/scorecard.txt','w')
 mistakes = open('results/mistakes.txt','w')
+settings = json.load(open('settings.json'))
 
-def queryall(queries,type='t',candidate='tester'):
+def queryall(questions,type='t',candidate='tester'):
     """Processes a dictionary of queries with keys as quesion numbers into a dictionary of dataframes
 
     ### Parameters:
@@ -32,17 +33,18 @@ def queryall(queries,type='t',candidate='tester'):
     """
     processed = {}
     db.rollback()
-    for query in queries:
+    for qnum in questions:
         try:
-            response = db.query(queries[query])
-            processed[query] = pd.DataFrame(response)
+            response = db.query(questions[qnum])
+            for item in response:
+                processed[qnum] = pd.DataFrame(item)
         except BaseException as err:
             if type == "t":
                 print(f'Error loading templates\nError: {err}\n---------------',file=log)
                 sys.exit()
             elif type == "r":
-                print(f'Candidate: {candidate}\nQuestion: {query}\nError: {err}\n---------------',file=log)
-                processed[query] = 'Err'
+                print(f'Candidate: {candidate}\nQuestion: {qnum}\nError: {err}\n---------------',file=log)
+                processed[qnum] = 'Err'
                 db.rollback() #rolls back so subsequent blocks can execute
     return processed
 
@@ -61,19 +63,42 @@ def mark(template,responses,ordered=[]):
         candnum += 1
         scores['name'].append(candidate)
         scores['score'].append(0)
+
         for qnum in responses[candidate]:
             res_table = responses[candidate][qnum]
             temp_table = template[qnum]
+
             if type(res_table) == str:
                 if res_table == 'Err':
                     print(f'Candidate: {candidate}\nQuestion: {qnum}\nError, see log\n------------',file=mistakes)
+
             elif res_table.size == 1:
                 if res_table.values == temp_table.values:
                     scores['score'][candnum] += 1
                 else:
                     incorrect(candidate,qnum)
+            
+            elif len(res_table) == 1:
+                if comparerow(temp_table[:],res_table[:]):
+                    scores['score'][candnum] += 1
+                else:
+                    incorrect(candidate,qnum)
+            
+            elif int(qnum) in ordered:
+                cols = list(res_table.columns)
+                print(res_table)
+                print(cols)
 
     return pd.DataFrame(scores)
+
+def comparerow(temp_row,res_row):
+    res = list(res_row)
+    try:
+        for item in temp_row:
+            res.remove(item)
+        return True
+    except ValueError:
+        return False
 
 def incorrect(candidate,qnum):
     queryfile = open(f'{os.getenv('responses')}\\{candidate}\\{qnum}.sql')

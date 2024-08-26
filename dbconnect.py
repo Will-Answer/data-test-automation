@@ -37,8 +37,10 @@ class Database():
         self.output = []
         for query in queries:
             self.ctrl.execute(query)
-            if query.upper().startswith('SELECT'):
+            try:
                 self.output.append(self.ctrl.fetchall())
+            except:
+                pass
         return self.output
     
     def rollback(self):
