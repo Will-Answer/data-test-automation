@@ -31,6 +31,7 @@ def queryall(queries,type='t',candidate='tester'):
     Outputs the candidate, question and error to log if a response causes an error
     """
     processed = {}
+    db.rollback()
     for query in queries:
         try:
             response = db.query(queries[query])
@@ -42,8 +43,7 @@ def queryall(queries,type='t',candidate='tester'):
             elif type == "r":
                 print(f'Candidate: {candidate}\nQuestion: {query}\nError: {err}\n---------------',file=log)
                 processed[query] = 'Err'
-                db.close() #reloads connection so subsequent blocks can execute
-                db.connect()
+                db.rollback() #rolls back so subsequent blocks can execute
     return processed
 
 def mark(template,responses,ordered=[]):
@@ -66,7 +66,7 @@ def mark(template,responses,ordered=[]):
             temp_table = template[qnum]
             if type(res_table) == str:
                 if res_table == 'Err':
-                    pass
+                    print(f'Candidate: {candidate}\nQuestion: {qnum}\nError, see log\n------------',file=mistakes)
             elif res_table.size == 1:
                 if res_table.values == temp_table.values:
                     scores['score'][candnum] += 1
