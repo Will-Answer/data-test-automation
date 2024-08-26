@@ -85,10 +85,37 @@ def mark(template,responses,ordered=[]):
                     incorrect(candidate,qnum)
             
             elif int(qnum) in ordered:
-                cols = list(res_table.columns)
-                print(res_table)
-                print(cols)
-
+                if res_table.shape[0] == temp_table.shape[0]:
+                    if comparerows(temp_table,res_table):
+                        scores['score'][candnum] += 1
+                    else:
+                        incorrect(candidate,qnum)
+                else:
+                    incorrect(candidate,qnum)
+            
+            else:
+                if res_table.shape[0] == temp_table.shape[0]:
+                    equivalent = True
+                    temp_dupe = temp_table[::1]
+                    for a in range(len(res_table.index)):
+                        found = False
+                        for b in range(len(temp_table.index)):
+                            try:
+                                if comparerow(temp_dupe[b:b],res_table[a:a]):
+                                    found = True
+                                    temp_dupe.drop([b])
+                                    break
+                            except IndexError:
+                                incorrect(candidate,qnum)
+                        if not found:
+                            incorrect(candidate,qnum)
+                            break
+                    if equivalent:
+                        scores['score'][candnum] += 1
+                    else:
+                        incorrect(candidate,qnum)
+                else:
+                    incorrect(candidate,qnum)
     return pd.DataFrame(scores)
 
 def comparerow(temp_row,res_row):
@@ -99,6 +126,18 @@ def comparerow(temp_row,res_row):
         return True
     except ValueError:
         return False
+
+def comparerows(temp_table,res_table):
+    comps = []
+    for i in range(len(list(res_table.index))):
+        try:
+            comps.append(comparerow(temp_table[i:i],res_table[i:i]))
+        except IndexError:
+            return False
+    if False in comps:
+        return False
+    else:
+        return True
 
 def incorrect(candidate,qnum):
     queryfile = open(f'{os.getenv('responses')}\\{candidate}\\{qnum}.sql')
