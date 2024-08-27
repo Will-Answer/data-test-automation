@@ -79,7 +79,7 @@ def mark(template,responses,ordered=[]):
                     incorrect(candidate,qnum)
             
             elif len(res_table) == 1: #handles single row outputs
-                if comparerow(temp_table[:],res_table[:]):
+                if comparerow(temp_table[0:0],res_table[0:0]):
                     scores['score'][candnum] += 1
                 else:
                     incorrect(candidate,qnum)
@@ -120,13 +120,21 @@ def mark(template,responses,ordered=[]):
 
 def comparerow(temp_row,res_row):
     '''Compares a template row of a dataframe to a response'''
-    res = list(res_row)
+    temp = convertints(list(temp_row.values.tolist()))
+    res = convertints(list(res_row.values.tolist()))
     try:
-        for item in temp_row:
+        for item in temp:
             res.remove(item)
         return True
     except ValueError:
         return False
+    
+def convertints(lst):
+    for i in range(len(lst)):
+        if lst[i] is str:
+            if lst[i].isnumeric():
+                lst[i] = int(lst[i])
+    return lst
 
 def comparerows(temp_table,res_table):
     '''Iterated comparerow() functions, taking a whole table instead of a single row'''
