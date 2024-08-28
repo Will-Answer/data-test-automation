@@ -3,6 +3,8 @@
 --creates schema
 DROP SCHEMA IF EXISTS raw CASCADE;
 CREATE SCHEMA raw;
+DROP SCHEMA IF EXISTS public CASCADE;
+CREATE SCHEMA public;
 
 --creates tables
 DROP TABLE IF EXISTS raw.game;

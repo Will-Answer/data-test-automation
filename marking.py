@@ -76,22 +76,22 @@ def mark(template,responses,ordered=[]):
                 if res_table.values == temp_table.values:
                     scores['score'][candnum] += 1
                 else:
-                    incorrect(candidate,qnum,res_table)
+                    incorrect(candidate,qnum,res_table,temp_table)
             
             elif len(res_table) == 1: #handles single row outputs
                 if comparerow(temp_table[0:0],res_table[0:0]):
                     scores['score'][candnum] += 1
                 else:
-                    incorrect(candidate,qnum,res_table)
+                    incorrect(candidate,qnum,res_table,temp_table)
             
             elif int(qnum) in ordered: #handles multi-row ordered outputs
                 if res_table.shape[0] == temp_table.shape[0]:
                     if comparerows(temp_table,res_table):
                         scores['score'][candnum] += 1
                     else:
-                        incorrect(candidate,qnum,res_table)
+                        incorrect(candidate,qnum,res_table,temp_table)
                 else:
-                    incorrect(candidate,qnum,res_table)
+                    incorrect(candidate,qnum,res_table,temp_table)
             
             else: #handles multi-row unordered outputs. compares each response row to the rows in template
                 if res_table.shape[0] == temp_table.shape[0]:
@@ -113,9 +113,9 @@ def mark(template,responses,ordered=[]):
                     if equivalent:
                         scores['score'][candnum] += 1
                     else:
-                        incorrect(candidate,qnum,res_table)
+                        incorrect(candidate,qnum,res_table,temp_table)
                 else:
-                    incorrect(candidate,qnum,res_table)
+                    incorrect(candidate,qnum,res_table,temp_table)
     return pd.DataFrame(scores)
 
 def comparerow(temp_row,res_row):
@@ -149,13 +149,13 @@ def comparerows(temp_table,res_table):
     else:
         return True
 
-def incorrect(candidate,qnum,table):
+def incorrect(candidate,qnum,table,correct):
     '''Outputs candidate name, question number and SQL query to mistakes file'''
     queryfile = open(f'{os.getenv('responses')}\\{candidate}\\{qnum}.sql')
     querylines = ''
     for line in queryfile:
         querylines += line
-    print(f'Candidate: {candidate}\nQuestion: {qnum}\nQuery:\n{querylines}\nOutput:\n{table}\n--------------\n',file=mistakes)
+    print(f'Candidate: {candidate}\nQuestion: {qnum}\nQuery:\n{querylines}\nOutput:\n{table}\n\nCorrect answer:\n{correct}\n--------------\n',file=mistakes)
     queryfile.close()
                     
 if __name__ == '__main__':
