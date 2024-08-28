@@ -20,6 +20,7 @@
 
 ## How to Use
 Create a directory containing model solutions to your questions. These model solutions will be passed to the database to produce an answer set that can be compared against each candidate's results. Each question should have an individual .sql file, with its file name being the question number.  
+Add a file called info.txt to the template directory. The first line should be an identifier to label the output directory with, then proceeding lines will be written to an info file in the output directory.   
 Edit the "requires_order" tag in settings.json to contain an array with the question numbers that require a specific order. By default, questions are marked without respect to the order of the table in the output, but this tag is passed to marking.py to let it know that those questions should be marked with order taken into consideration.  
 Create a directory that will store the candidate files. Each candidate should have their own folder that contains their .sql files. Each question in the responses should also have its own file, with filename [question number].sql, like in the template directory.  
 To run, run marking.py as \_\_main\_\_ (ie. run with the python interpreter by double clicking on it or running it in command prompt)

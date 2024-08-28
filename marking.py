@@ -5,17 +5,26 @@ from dotenv import load_dotenv
 import sys
 import json
 import os
+import datetime
 
-log = open('log.txt','a') #open logs and database
+#open logs and database
 db = dbc.Database()
 with open('settings.json') as settingsjson:
     settings = json.load(settingsjson)
 load_dotenv()
+info = load.get_info()
+name = info.readline().strip()
+now = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
 if 'results' not in os.listdir():
     os.mkdir('results')
-scorecard = open('results/scorecard.txt','w')
-mistakes = open('results/mistakes.txt','w')
-settings = json.load(open('settings.json'))
+dir = f'results/{name}_{now}'
+os.mkdir(dir)
+log = open(f'{dir}/log.txt','w')
+scorecard = open(f'{dir}/scorecard.txt','w')
+mistakes = open(f'{dir}/mistakes.txt','w')
+infonew = open(f'{dir}/info.txt','w')
+for line in info:
+    infonew.write(line)
 
 def queryall(questions,type='t',candidate='tester'):
     """Processes a dictionary of queries with keys as quesion numbers into a dictionary of dataframes

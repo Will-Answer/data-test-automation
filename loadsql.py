@@ -78,5 +78,10 @@ def get_responses():
         responses[dir] = extract(f'{os.getenv('responses')}\\{dir}')
     return responses
 
+def get_info():
+    tempdir = os.listdir(os.getenv('template'))
+    if 'info.txt' in tempdir:
+        return open(f'{os.getenv('template')}/info.txt','r')
+
 if __name__ == '__main__':
     print(get_responses()['will_pinder']['2'])
