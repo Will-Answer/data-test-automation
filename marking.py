@@ -6,7 +6,6 @@ from dotenv import load_dotenv
 import sys
 import json
 import os
-import datetime
 
 #open logs and database
 db = dbc.Database()
@@ -169,17 +168,15 @@ def incorrect(candidate,qnum,table,correct):
     print(f'Candidate: {candidate}\nQuestion: {qnum}\nQuery:\n{querylines}\nOutput:\n{table}\n\nCorrect answer:\n{correct}\n--------------\n',file=mistakes,flush=True)
     queryfile.close()
                     
-def main():
+def main(now):
     global log
     global mistakes
     global scorecard
-
-    now = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
     if 'results' not in os.listdir():
         os.mkdir('results')
     dir = f'results/{name}_{now}'
-    if f'{name}_{now}' not in os.listdir('results'):
-        os.mkdir(dir)
+    print(dir)
+    os.mkdir(dir)
     log = open(f'{dir}/log.txt','w')
     scorecard = open(f'{dir}/scorecard.txt','w')
     mistakes = open(f'{dir}/mistakes.txt','w')
@@ -195,6 +192,10 @@ def main():
         response_proc[candidate] = queryall(responses[candidate],'r',candidate)
 
     print(mark(template_proc,response_proc,settings['requires_order']),file=scorecard,flush=True) #compares templates to responses
+    log.close()
+    mistakes.close()
+    scorecard.close()
+    infonew.close()
     return 'Done it :)'
 '''for i in template_proc: #prints the processed templates and responses
     print(f'{i})\n{template_proc[i]}\n\n')
