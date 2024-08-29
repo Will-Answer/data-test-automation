@@ -83,5 +83,3 @@ def get_info():
     if 'info.txt' in tempdir:
         return open(f'{os.getenv('template')}/info.txt','r')
 
-if __name__ == '__main__':
-    print(get_responses()['will_pinder']['2'])
