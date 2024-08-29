@@ -23,6 +23,7 @@ By default, psql_setup.sql is populated with a sample game server dataset. If us
 
 ## How to Use
 Create a directory containing model solutions to your questions. These model solutions will be passed to the database to produce an answer set that can be compared against each candidate's results. Each question should have an individual .sql file, with its file name being the question number.  
+  
 Add a file called info.txt to the template directory. The first line should be an identifier to label the output directory with, then proceeding lines will be written to an info file in the output directory.   
   
 Edit the "requires_order" tag in settings.json to contain an array with the question numbers that require a specific order. By default, questions are marked without respect to the order of the table in the output, but this tag is passed to marking.py to let it know that those questions should be marked with order taken into consideration.  
