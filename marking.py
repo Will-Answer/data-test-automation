@@ -1,6 +1,7 @@
 import dbconnect as dbc
 import loadsql as load
 import pandas as pd
+import decimal
 from dotenv import load_dotenv
 import sys
 import json
@@ -88,7 +89,7 @@ def mark(template,responses,ordered=[]):
                     incorrect(candidate,qnum,res_table,temp_table)
             
             elif len(res_table) == 1: #handles single row outputs
-                if comparerow(temp_table[0:0],res_table[0:0]):
+                if comparerow(temp_table[:],res_table[:]):
                     scores['score'][candnum] += 1
                 else:
                     incorrect(candidate,qnum,res_table,temp_table)
@@ -106,17 +107,18 @@ def mark(template,responses,ordered=[]):
                 if res_table.shape[0] == temp_table.shape[0]:
                     equivalent = True
                     temp_dupe = temp_table[::1]
+                    res_dupe = temp_dupe[::1]
                     for a in range(len(res_table.index)):
                         found = False
                         for b in range(len(temp_table.index)):
                             try:
-                                if comparerow(temp_dupe[b:b],res_table[a:a]): #if a match is found, delete that row and go to the next row in response
+                                if comparerow(temp_dupe[b:b+1],res_dupe[a:a+1]): #if a match is found, delete that row and go to the next row in response
                                     found = True
-                                    temp_dupe.drop([b])
                                     break
                             except IndexError: #if no matching row is found, loop breaks and q is marked as incorrect 
                                 break
                         if not found:
+                            print('not found',a,b)
                             equivalent = False
                             break
                     if equivalent:
@@ -129,8 +131,11 @@ def mark(template,responses,ordered=[]):
 
 def comparerow(temp_row,res_row):
     '''Compares a template row of a dataframe to a response'''
-    temp = convertints(list(temp_row.values.tolist()))
-    res = convertints(list(res_row.values.tolist()))
+    temp = scrub(temp_row.values.flatten().tolist())
+    res = scrub(res_row.values.flatten().tolist())
+    print('\n',temp,'\n',res)
+    if type(temp) == float:
+        print(temp,'\n\n',res,'\n')
     try:
         for item in temp:
             res.remove(item)
@@ -138,11 +143,21 @@ def comparerow(temp_row,res_row):
     except ValueError:
         return False
     
-def convertints(lst):
+def scrub(lst):
     for i in range(len(lst)):
-        if lst[i] is str:
+        cls = type(lst[i])
+        if cls == str:
+            lst[i] = lst[i].strip()
             if lst[i].isnumeric():
                 lst[i] = int(lst[i])
+        elif cls == decimal.Decimal:
+            lst[i] = float(lst[i])
+            lst[i] = f'{lst[i]}'[:5]
+            lst[i] = float(lst[i])
+            try:
+                lst[i] = int(lst[i])
+            except TypeError:
+                pass
     return lst
 
 def comparerows(temp_table,res_table):
@@ -150,7 +165,7 @@ def comparerows(temp_table,res_table):
     comps = []
     for i in range(len(list(res_table.index))):
         try:
-            comps.append(comparerow(temp_table[i:i],res_table[i:i]))
+            comps.append(comparerow(temp_table[i:i+1],res_table[i:i+1]))
         except IndexError:
             return False
     if False in comps:

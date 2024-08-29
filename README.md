@@ -26,6 +26,9 @@ Create a directory that will store the candidate files. Each candidate should ha
 To run, run marking.py as \_\_main\_\_ (ie. run with the python interpreter by double clicking on it or running it in command prompt)
 The score of each candidate is written to results/scorecard.txt as a pandas dataframe. Any mistakes are written to results/mistakes.txt for review of the query. Any erroneous queries are output to log.txt for review.
 
+### Notes
+Only include the essential columns to the template queries. The program checks that each row of the response contains the elements of the template, but ignores any extras. Unnescessary columns in the templates will mean responses may be erroneously marked incorrectly.
+
 ## Troubleshooting
 
 If init.cmd does not work, check the installation directory of Postgres. You might have to change the PATH commands. Alternatively, you could manually add it to PATH in the system environment variables if you have admin access, but I don't :(  
