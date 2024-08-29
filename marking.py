@@ -118,7 +118,6 @@ def mark(template,responses,ordered=[]):
                             except IndexError: #if no matching row is found, loop breaks and q is marked as incorrect 
                                 break
                         if not found:
-                            print('not found',a,b)
                             equivalent = False
                             break
                     if equivalent:
@@ -133,9 +132,6 @@ def comparerow(temp_row,res_row):
     '''Compares a template row of a dataframe to a response'''
     temp = scrub(temp_row.values.flatten().tolist())
     res = scrub(res_row.values.flatten().tolist())
-    print('\n',temp,'\n',res)
-    if type(temp) == float:
-        print(temp,'\n\n',res,'\n')
     try:
         for item in temp:
             res.remove(item)
