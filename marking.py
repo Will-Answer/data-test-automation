@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 import sys
 import json
 import os
+from datetime import datetime
 
 #open logs and database
 db = dbc.Database()
@@ -176,7 +177,8 @@ def main(now):
         os.mkdir('results')
     dir = f'results/{name}_{now}'
     print(dir)
-    os.mkdir(dir)
+    if f'{name}_{now}' not in os.listdir('results'):
+        os.mkdir(dir)
     log = open(f'{dir}/log.txt','w')
     scorecard = open(f'{dir}/scorecard.txt','w')
     mistakes = open(f'{dir}/mistakes.txt','w')
@@ -197,6 +199,8 @@ def main(now):
     scorecard.close()
     infonew.close()
     return 'Done it :)'
+if __name__=='__main__':
+    print(main(datetime.now()))
 '''for i in template_proc: #prints the processed templates and responses
     print(f'{i})\n{template_proc[i]}\n\n')
 
