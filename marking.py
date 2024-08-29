@@ -148,7 +148,9 @@ def scrub(lst):
                 lst[i] = int(lst[i])
         elif cls == decimal.Decimal:
             lst[i] = float(lst[i])
-            lst[i] = f'{lst[i]}'[:5]
+            lst[i] = f'{lst[i]}'.split('.')
+            lst[i][1] = lst[i][1][:4]
+            lst[i] = '.'.join(lst[i])
             lst[i] = float(lst[i])
             try:
                 lst[i] = int(lst[i])
