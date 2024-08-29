@@ -1,6 +1,6 @@
 # Answer Digital Auto Marking for Data Test
 
-## --Setup--
+## Setup
 - Install PostgreSQL: https://www.postgresql.org/ - remember the database name, username and password you enter
 - Install Python interpreter https://www.python.org/downloads/ - ensure you tick "Add python to PATH"
 - Install package dependences (listed in dependencies section)
@@ -13,18 +13,39 @@
     - template = [Directory of template SQL queries]
     - responses = [Directory of test submissions]
 
+### Notes
+By default, psql_setup.sql is populated with a sample game server dataset. If using a different dataset, you will need to provide your own setup file with different CREATE and INSERT commands. On a similar note, in settings.json, there is an array tag called "rollback" that is appended to the ROLLBACK query in dbconnect.rollback(). By default this has commands that tell the serial sequences for the game dataset to reset, but for any other dataset, they will need to be altered.
+
 ### Dependencies  
 - Pandas (pip install pandas)
 - Psycopg2 (pip install psycopg2)
 - Python-dotenv (pip install python-dotenv)  
 
-## --How to use--
+## How to Use
 Create a directory containing model solutions to your questions. These model solutions will be passed to the database to produce an answer set that can be compared against each candidate's results. Each question should have an individual .sql file, with its file name being the question number.  
+  
+Add a file called info.txt to the template directory. The first line should be an identifier to label the output directory with, then proceeding lines will be written to an info file in the output directory.   
+  
 Edit the "requires_order" tag in settings.json to contain an array with the question numbers that require a specific order. By default, questions are marked without respect to the order of the table in the output, but this tag is passed to marking.py to let it know that those questions should be marked with order taken into consideration.  
+  
 Create a directory that will store the candidate files. Each candidate should have their own folder that contains their .sql files. Each question in the responses should also have its own file, with filename [question number].sql, like in the template directory.  
-The output currently is just a log that informs of any errors. This will be updated later when marking.py is complete
+  
+To run, run marking.py as \_\_main\_\_ (ie. run with the python interpreter by double clicking on it or running it in command prompt)
+The score of each candidate is written to results/scorecard.txt as a pandas dataframe. Any mistakes are written to results/mistakes.txt for review of the query. Any erroneous queries are output to log.txt for review.
 
-## --Troubleshooting--
+### Notes
+Only include the essential columns to the template queries. The program checks that each row of the response contains the elements of the template, but ignores any extras. Unnescessary columns in the templates will mean responses may be erroneously marked incorrectly.
 
-If init.cmd does not work, check the installation directory of Postgres. You might have to change the PATH commands.  
-If pip doesn't work, make sure it is in PATH in the system environment variables.  
+## Troubleshooting
+
+If init.cmd does not work, check the installation directory of Postgres. You might have to change the PATH commands. Alternatively, you could manually add it to PATH in the system environment variables if you have admin access, but I don't :(  
+   
+If pip doesn't work, make sure it is in PATH in the system environment variables. You can do this through the installer. 
+   
+If there are issues regarding INSERT or other non-select commands, the database reverts to its initial state when there is an error and at the start of each candidate's set of queries. This may cause issues if a query fails and other queries are dependent on it executing.  
+   
+The way the database reverts is via the SAVEPOINT and ROLLBACK queries. ROLLBACK is unable to revert once COMMIT has been used, which could cause issues when the next candidate is processed. To undo any commits, init.cmd must be rerun.  
+
+## Thanks
+Thank you to Yamin and Harry for reviewing this project.  
+Thank you to everyone at Answer for being so welcoming.  

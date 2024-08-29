@@ -1,3 +1,4 @@
 {
-    "requires_order": [10]
+    "requires_order": [10],
+    "rollback": ["ALTER SEQUENCE raw.game_id_seq RESTART WITH 11;","ALTER SEQUENCE raw.member_id_seq RESTART WITH 1001;","ALTER SEQUENCE raw.member_game_instance_id_seq RESTART WITH 5000;"]
 }

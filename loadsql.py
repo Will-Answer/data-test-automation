@@ -33,6 +33,8 @@ def extract(dir):
 
                 for line in open(file): #reads files, adds comments to the comment list and queries to the query list
                     if not line.startswith('--'):
+                        split = line.split('--')
+                        line = split[0]
                         querlines.append(line.strip())
                     elif line.isspace():
                         pass
@@ -42,7 +44,10 @@ def extract(dir):
 
                 for iter in range(len(queries)): #parses the queries
                     if not queries[iter] == '':
-                        queries[iter] = queries[iter].strip() + ';'
+                        if not queries[iter].strip() == '':
+                            queries[iter] = queries[iter].strip() + ';'
+                        else:
+                            queries.remove(queries[iter])
                     else:
                         queries.remove('')
                 contents[filename] = queries
@@ -73,5 +78,8 @@ def get_responses():
         responses[dir] = extract(f'{os.getenv('responses')}\\{dir}')
     return responses
 
-if __name__ == '__main__':
-    print(get_responses()['will_pinder']['2'])
+def get_info():
+    tempdir = os.listdir(os.getenv('template'))
+    if 'info.txt' in tempdir:
+        return open(f'{os.getenv('template')}/info.txt','r')
+
