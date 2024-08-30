@@ -115,7 +115,9 @@ def mark(template,responses,ordered=[]):
                         incorrect(candidate,qnum,res_table,temp_table)
                 else:
                     incorrect(candidate,qnum,res_table,temp_table)
-    return pd.DataFrame(scores)
+    scoresframe = pd.DataFrame(scores)
+    scoresframe=scoresframe.sort_values(by=['score'],ascending=False)
+    return scoresframe
 
 def comparerow(temp_row,res_row):
     '''Compares a template row of a dataframe to a response'''
@@ -191,7 +193,6 @@ def main(now):
     response_proc = {}
     for candidate in responses: #processes responses
         response_proc[candidate] = queryall(responses[candidate],'r',candidate)
-
     print(mark(template_proc,response_proc,settings['requires_order']),file=scorecard,flush=True) #compares templates to responses
     log.close()
     mistakes.close()
