@@ -176,7 +176,6 @@ def main(now):
     if 'results' not in os.listdir():
         os.mkdir('results')
     dir = f'results/{name}_{now}'
-    print(dir)
     if f'{name}_{now}' not in os.listdir('results'):
         os.mkdir(dir)
     log = open(f'{dir}/log.txt','w')
