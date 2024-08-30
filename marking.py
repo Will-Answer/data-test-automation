@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 import sys
 import json
 import os
-import datetime
+from datetime import datetime
 
 #open logs and database
 db = dbc.Database()
@@ -15,17 +15,6 @@ with open('settings.json') as settingsjson:
 load_dotenv()
 info = load.get_info()
 name = info.readline().strip()
-now = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
-if 'results' not in os.listdir():
-    os.mkdir('results')
-dir = f'results/{name}_{now}'
-os.mkdir(dir)
-log = open(f'{dir}/log.txt','w')
-scorecard = open(f'{dir}/scorecard.txt','w')
-mistakes = open(f'{dir}/mistakes.txt','w')
-infonew = open(f'{dir}/info.txt','w')
-for line in info:
-    infonew.write(line)
 
 def queryall(questions,type='t',candidate='tester'):
     """Processes a dictionary of queries with keys as quesion numbers into a dictionary of dataframes
@@ -50,10 +39,10 @@ def queryall(questions,type='t',candidate='tester'):
                 processed[qnum] = pd.DataFrame(item)
         except BaseException as err:
             if type == "t":
-                print(f'Error loading templates\nError: {err}\n---------------',file=log)
+                print(f'Error loading templates\nError: {err}\n---------------',file=log,flush=True)
                 sys.exit()
             elif type == "r":
-                print(f'Candidate: {candidate}\nQuestion: {qnum}\nError: {err}\n---------------',file=log)
+                print(f'Candidate: {candidate}\nQuestion: {qnum}\nError: {err}\n---------------',file=log,flush=True)
                 processed[qnum] = 'Err'
                 db.rollback() #rolls back so subsequent blocks can execute
     return processed
@@ -80,7 +69,7 @@ def mark(template,responses,ordered=[]):
 
             if type(res_table) == str: #error output
                 if res_table == 'Err':
-                    print(f'Candidate: {candidate}\nQuestion: {qnum}\nError, see log\n------------',file=mistakes)
+                    print(f'Candidate: {candidate}\nQuestion: {qnum}\nError, see log\n------------',file=mistakes,flush=True)
 
             elif res_table.size == 1: #handles single value outputs
                 if res_table.values == temp_table.values:
@@ -126,7 +115,9 @@ def mark(template,responses,ordered=[]):
                         incorrect(candidate,qnum,res_table,temp_table)
                 else:
                     incorrect(candidate,qnum,res_table,temp_table)
-    return pd.DataFrame(scores)
+    scoresframe = pd.DataFrame(scores)
+    scoresframe=scoresframe.sort_values(by=['score'],ascending=False)
+    return scoresframe
 
 def comparerow(temp_row,res_row):
     '''Compares a template row of a dataframe to a response'''
@@ -177,10 +168,24 @@ def incorrect(candidate,qnum,table,correct):
     querylines = ''
     for line in queryfile:
         querylines += line
-    print(f'Candidate: {candidate}\nQuestion: {qnum}\nQuery:\n{querylines}\nOutput:\n{table}\n\nCorrect answer:\n{correct}\n--------------\n',file=mistakes)
+    print(f'Candidate: {candidate}\nQuestion: {qnum}\nQuery:\n{querylines}\nOutput:\n{table}\n\nCorrect answer:\n{correct}\n--------------\n',file=mistakes,flush=True)
     queryfile.close()
                     
-if __name__ == '__main__':
+def main(now):
+    global log
+    global mistakes
+    global scorecard
+    if 'results' not in os.listdir():
+        os.mkdir('results')
+    dir = f'results/{name}_{now}'
+    if f'{name}_{now}' not in os.listdir('results'):
+        os.mkdir(dir)
+    log = open(f'{dir}/log.txt','w')
+    scorecard = open(f'{dir}/scorecard.txt','w')
+    mistakes = open(f'{dir}/mistakes.txt','w')
+    infonew = open(f'{dir}/info.txt','w')
+    for line in info:
+        infonew.write(line)
     template = load.get_template() #loads template responses into a dictionary of pandas dataframes (keys are question numbers)
     responses = load.get_responses() #loads responses into a dictionary of dictionaries of pandas dataframes (keys are candidates then quesiton numbers)
 
@@ -188,8 +193,14 @@ if __name__ == '__main__':
     response_proc = {}
     for candidate in responses: #processes responses
         response_proc[candidate] = queryall(responses[candidate],'r',candidate)
-
-    print(mark(template_proc,response_proc,settings['requires_order']),file=scorecard) #compares templates to responses
+    print(mark(template_proc,response_proc,settings['requires_order']),file=scorecard,flush=True) #compares templates to responses
+    log.close()
+    mistakes.close()
+    scorecard.close()
+    infonew.close()
+    return 'Done it :)'
+if __name__=='__main__':
+    print(main(datetime.now()))
 '''for i in template_proc: #prints the processed templates and responses
     print(f'{i})\n{template_proc[i]}\n\n')
 
