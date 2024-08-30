@@ -1,8 +1,47 @@
 <html>
+    <head>
+        <style>
+            .column {
+                float: left;
+                width: 33.33%
+            }
+            .row:after {
+                content: "";
+                display: table;
+                clear: both;
+            }
+            iframe {
+                overflow-x: scroll;
+                overflow-y: scroll;
+                width: 400px;
+                height: 60%;
+            }
+        </style>
+    </head>
     <body>
         <h2>This is the output page</h2>
-        <p>It will eventually display the output of the marking operation. For now just check the results folder.</p>
-        <p>{{info}}</p>
+        <p>Click the titles to go into full screen</p>
+        <p>Batch info: {{info}}<br>Folder: {{dir}}</p>
+        <div class="row">
+            <div class="column">
+                <h3>
+                    <a href="/output/scorecard">Scores</a>
+                </h3>
+                <iframe src="/output/scorecard"></iframe>
+            </div>
+            <div class="column">
+                <h3>
+                    <a href="/output/mistakes">Mistakes</a>
+                </h3>
+                <iframe src="/output/mistakes"></iframe>
+            </div>
+            <div class="column">
+                <h3>
+                    <a href="/output/log">Log</a>
+                </h3>
+                <iframe src="/output/log"></iframe>
+            </div>
         </div>
+        <button onclick="window.location.href='/exit'">Exit</button>
     </body>
 </html>

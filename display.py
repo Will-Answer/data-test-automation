@@ -20,6 +20,7 @@ def process():
 
 @app.route('/output')
 def output():
+    global recent
     os.chdir(root)
     maxtime = 0
     recent = ''
@@ -28,17 +29,31 @@ def output():
         if compare > maxtime:
             maxtime = compare + 0
             recent = f'results/{dir}'
-    info = ''
-    with open(f'{root}/{recent}/info.txt') as infofile:
-        for line in infofile:
-            info += str(line)
-    """
-    scores = f'{recent}/scorecard.txt'
-    mistakes = f'{recent}/mistakes.txt'
-    log = f'{recent}/log.txt'
-    """
+    info = readall(f'{recent}\\info.txt')
+    return f.render_template('output.html', info=info, dir=recent)
 
-    return f.render_template('output.html', info=info)
+@app.route('/output/scorecard')
+def scores():
+    return f.send_file(f'{recent}\\scorecard.txt')
+
+@app.route('/output/mistakes')
+def mistakes():
+    return f.send_file(f'{recent}\\mistakes.txt')
+
+@app.route('/output/log')
+def log():
+    return f.send_file(f'{recent}\\log.txt')
+
+@app.route('/exit')
+def appexit():
+    os._exit(0)
+
+def readall(file):
+    info = ''
+    with open(file) as opened:
+        for line in opened:
+            info += str(line)
+    return info
 
 if __name__ == '__main__':
     app.run(debug=True)
